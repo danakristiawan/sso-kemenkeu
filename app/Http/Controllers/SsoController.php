@@ -49,7 +49,6 @@ class SsoController extends Controller
                         $userInfo =  json_decode($responseToken->getBody()->getContents(), true);
                         $userFromDb = User::where('nip', $userInfo['nip'])->first();
                         
-                        // if(isset($user->id)) 
                         if(!$userFromDb) 
                         {
                             $newUser = new User([

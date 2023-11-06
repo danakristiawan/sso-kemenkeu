@@ -47,17 +47,28 @@ class SsoController extends Controller
                 if ($responseToken) 
                     {
                         $userInfo =  json_decode($responseToken->getBody()->getContents(), true);
-                        $user = User::where('nip', $userInfo['nip'])->first();
+                        $userFromDb = User::where('nip', $userInfo['nip'])->first();
                         
-                        if(isset($user->id)) 
+                        // if(isset($user->id)) 
+                        if(!$userFromDb) 
                         {
+                            $newUser = new User([
+                                'nama' => $userInfo['name'],
+                                'nip' => $userInfo['nip'],
+                            ]);
+
+                            $newUser->save();
+
+                            Auth::login($newUser);
                             Session::regenerate();
-                            Auth::loginUsingId($user->id);
                             Session::put('userInfo', $userInfo);
                             return redirect()->intended('/home');
                         }
 
-                        dd("user tidak ada!");
+                        Auth::login($userFromDb);
+                        Session::regenerate();
+                        Session::put('userInfo', $userInfo);
+                        return redirect()->intended('/home');
                     }
 
                     dd("response tidak ada!");

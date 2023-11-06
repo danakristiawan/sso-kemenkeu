@@ -12,14 +12,23 @@ class SsoController extends Controller
 {
     public function sso()
     {
-        return redirect(config('sso.base_uri').config('sso.authorize')['endpoint'].'?grant_type='.config('sso.authorize')['grant_type'].'&response_type='.config('sso.authorize')['response_type'].'&client_id='.config('sso.authorize')['client_id'].'&scope='.config('sso.authorize')['scope'].'&nonce='.  config('sso.authorize')['nonce'].'state='.config('sso.authorize')['state'].'&redirect_uri='.config('sso.authorize')['redirect_uri']);
+        $uri = config('sso.base_uri').config('sso.authorize')['endpoint'];
+        $grant_type = config('sso.authorize')['grant_type'];
+        $response_type = config('sso.authorize')['response_type'];
+        $client_id = config('sso.authorize')['client_id'];
+        $scope = config('sso.authorize')['scope'];
+        $nonce = config('sso.authorize')['nonce'];
+        $state = config('sso.authorize')['state'];
+        $redirect_uri = config('sso.authorize')['redirect_uri'];
+        $session_url = $uri.'?grant_type='.$grant_type.'&response_type='.$response_type.'&client_id='.$client_id.'&scope='.$scope.'&nonce='.$nonce.'state='.$state.'&redirect_uri='.$redirect_uri;
+        
+        return redirect($session_url);
     }
 
     public function connect(Request $request)
     {
-        Session::regenerate();
-
-        if ($request->code) {
+        if ($request->code) 
+        {
             $responseCode = Http::asForm()->post(config('sso.base_uri').config('sso.token')['endpoint'],[
                 'client_id' => config('sso.authorize')['client_id'],
                 'grant_type' => config('sso.authorize')['grant_type'],
@@ -27,47 +36,44 @@ class SsoController extends Controller
                 'code' => $request->code,
                 'redirect_uri' => config('sso.authorize')['redirect_uri']
             ]);
-
             $token =  json_decode($responseCode->getBody()->getContents(), true);
-
-            if(!isset($token['access_token'])) {
-                return redirect('/sso');
-            }
-
-            if ($token['access_token']) {
+            
+            if (isset($token['access_token'])) 
+            {
                 $responseToken = Http::asForm()->post(config('sso.base_uri').config('sso.userinfo')['endpoint'],[
                     'access_token' => $token['access_token']
                 ]);
-
-                    if ($responseToken) {
+                    
+                if ($responseToken) 
+                    {
                         $userInfo =  json_decode($responseToken->getBody()->getContents(), true);
                         $user = User::where('nip', $userInfo['nip'])->first();
-
-                        if(isset($user->id)) {
-                            Auth::loginUsingId($user->id);
+                        
+                        if(isset($user->id)) 
+                        {
                             Session::regenerate();
+                            Auth::loginUsingId($user->id);
                             Session::put('userInfo', $userInfo);
                             return redirect()->intended('/home');
+                        }
 
-                        } else {
-                            redirect('/')->with('gagal','User belum terdaftar');}
+                        dd("user tidak ada!");
+                    }
 
-                    } else {
-                    redirect('/')->with('gagal','Request Error');}
+                    dd("response tidak ada!");
+            } 
 
-            } else {
-                redirect('/')->with('gagal','Request Error');}
+            dd("token tidak ada!");
+        }
 
-        } else {
-            redirect('/')->with('gagal','Request Error');}
+        dd("request code tidak ada!");
     }
+
 
     public function logout(Request $request)
     {
         Auth::logout();
- 
         Session::invalidate();
-    
         Session::regenerateToken();
 
         $uri = config('sso.base_uri') . config('sso.endsession.endpoint');

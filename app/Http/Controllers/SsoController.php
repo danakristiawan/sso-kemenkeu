@@ -51,6 +51,7 @@ class SsoController extends Controller
                         $user = User::updateOrCreate([
                             'nama' => $userInfo['name'],
                             'nip' => $userInfo['nip'],
+                            'kode_satker' => $userInfo['kode_satker'],
                         ]);
 
                         Auth::login($user);

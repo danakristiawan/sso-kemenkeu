@@ -21,15 +21,15 @@
                 Home
             </div>
             <div class="card-body">
-                <p class="card-text">Nama : {{ $userInfo['name'] }}</p>
-                <p class="card-text">NIP : {{ $userInfo['nip'] }}</p>
-                <p class="card-text">Jabatan : {{ $userInfo['jabatan'] }}</p>
-                <p class="card-text">Organisasi : {{ $userInfo['organisasi'] }}</p>
-                <p class="card-text">Jenis jabatan : {{ $userInfo['jenis_jabatan'] }}</p>
-                <p class="card-text">No. Telp : {{ $userInfo['phone_number'] }}</p>
-                <p class="card-text">NIK : {{ $userInfo['g2c_Nik'] }}</p>
-                <p class="card-text">NPWP : {{ $userInfo['g2c_Npwp'] }}</p>
-                <p class="card-text">Kode Satker : {{ $userInfo['kode_satker'] }}</p>
+                <p class="card-text">Nama : {{ $userInfo->name }}</p>
+                <p class="card-text">NIP : {{ $userInfo->nip }}</p>
+                <p class="card-text">Jabatan : {{ $userInfo->jabatan }}</p>
+                <p class="card-text">Organisasi : {{ $userInfo->organisasi }}</p>
+                <p class="card-text">Jenis jabatan : {{ $userInfo->jenis_jabatan }}</p>
+                <p class="card-text">No. Telp : {{ $userInfo->phone_number }}</p>
+                <p class="card-text">NIK : {{ $userInfo->g2c_Nik }}</p>
+                <p class="card-text">NPWP : {{ $userInfo->g2c_Npwp }}</p>
+                <p class="card-text">Kode Satker : {{ $userInfo->kode_satker }}</p>
                 <a href="{{ route('logout') }}" class="btn btn-primary">Logout</a>
             </div>
         </div>

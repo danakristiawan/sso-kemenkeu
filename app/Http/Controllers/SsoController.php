@@ -36,22 +36,22 @@ class SsoController extends Controller
                 'code' => $request->code,
                 'redirect_uri' => config('sso.authorize')['redirect_uri']
             ]);
-            $token =  json_decode($responseCode->getBody()->getContents(), true);
+            $token =  json_decode($responseCode->getBody()->getContents(), false);
             
             if ($responseCode) 
             {
                 $responseToken = Http::asForm()->post(config('sso.base_uri').config('sso.userinfo')['endpoint'],[
-                    'access_token' => $token['access_token']
+                    'access_token' => $token->access_token
                 ]);
                     
                 if ($responseToken) 
                     {
-                        $userInfo =  json_decode($responseToken->getBody()->getContents(), true);
+                        $userInfo =  json_decode($responseToken->getBody()->getContents(), false);
 
                         $user = User::updateOrCreate([
-                            'nama' => $userInfo['name'],
-                            'nip' => $userInfo['nip'],
-                            'kode_satker' => $userInfo['kode_satker'],
+                            'nama' => $userInfo->name,
+                            'nip' => $userInfo->nip,
+                            'kode_satker' => $userInfo->kode_satker,
                         ]);
 
                         Auth::login($user);

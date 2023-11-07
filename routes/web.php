@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Session;
 
 Route::get('/', function () {
     return view('welcome');
-})->name('welcome')->middleware('guest');
+})->name('welcome');
 
 Route::get('/home', function () {
     return view('home');
@@ -25,5 +25,5 @@ Route::get('/home', function () {
 
 Route::get('/sso', [SsoController::class, 'sso'])->name('sso');
 Route::get('/connect', [SsoController::class, 'connect']);
-Route::get('/logout', [SsoController::class, 'logout'])->name('logout');
+Route::get('/logout', [SsoController::class, 'logout'])->name('logout')->middleware('auth');
 

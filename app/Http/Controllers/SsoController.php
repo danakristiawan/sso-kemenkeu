@@ -27,7 +27,7 @@ class SsoController extends Controller
 
     public function connect(Request $request)
     {
-        if ($request->code) 
+        if ($request) 
         {
             $responseCode = Http::asForm()->post(config('sso.base_uri').config('sso.token')['endpoint'],[
                 'client_id' => config('sso.authorize')['client_id'],
@@ -38,7 +38,7 @@ class SsoController extends Controller
             ]);
             $token =  json_decode($responseCode->getBody()->getContents(), true);
             
-            if (isset($token['access_token'])) 
+            if ($responseCode) 
             {
                 $responseToken = Http::asForm()->post(config('sso.base_uri').config('sso.userinfo')['endpoint'],[
                     'access_token' => $token['access_token']
@@ -47,24 +47,13 @@ class SsoController extends Controller
                 if ($responseToken) 
                     {
                         $userInfo =  json_decode($responseToken->getBody()->getContents(), true);
-                        $userFromDb = User::where('nip', $userInfo['nip'])->first();
-                        
-                        if(!$userFromDb) 
-                        {
-                            $newUser = new User([
-                                'nama' => $userInfo['name'],
-                                'nip' => $userInfo['nip'],
-                            ]);
 
-                            $newUser->save();
+                        $user = User::updateOrCreate([
+                            'nama' => $userInfo['name'],
+                            'nip' => $userInfo['nip'],
+                        ]);
 
-                            Auth::login($newUser);
-                            Session::regenerate();
-                            Session::put('userInfo', $userInfo);
-                            return redirect()->intended('/home');
-                        }
-
-                        Auth::login($userFromDb);
+                        Auth::login($user);
                         Session::regenerate();
                         Session::put('userInfo', $userInfo);
                         return redirect()->intended('/home');

@@ -12,7 +12,8 @@ class DataRekeningController extends Controller
      */
     public function index()
     {
-        //
+        $data = DataRekening::satker()->get();
+        dd($data);
     }
 
     /**

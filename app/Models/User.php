@@ -21,6 +21,7 @@ class User extends Authenticatable
         'nama',
         'nip',
         'kode_satker',
+        'password',
     ];
 
     /**
